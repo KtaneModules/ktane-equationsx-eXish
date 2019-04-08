@@ -1,1 +1,1 @@
-# ktane-equationsx
+#[ModKit Wiki](../../wiki)
