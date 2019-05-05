@@ -19,10 +19,12 @@ public class EquationsScript : MonoBehaviour {
     int symbol;
 
     private string numbers;
-    private string[] cheers = {"Nice!","GJ","Defused","Cleared"};
+    private string[] cheers = {"Nice!","GJ","Defused","Cleared","We did it?"};
 
     private float answerlong;
     private float answersimp;
+    //moved here to allow for rule 3 of position to function properly
+    private float[] newnumbers;
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -59,7 +61,74 @@ public class EquationsScript : MonoBehaviour {
     }
 	
 	void Update () {
-		if((bomb.GetStrikes() == 2) && (symbol == 7))
+        if ((bomb.GetSolvedModuleNames().Count >= 2) && (symbol == 5))
+        {
+            if (announceonce != 2)
+            {
+                announceonce = 1;
+                bool rule1 = false;
+                bool rule2 = false;
+                bool rule3 = false;
+                bool rule4 = false;
+                bool rule5 = false;
+                if ((bomb.GetBatteryCount() > 1) && isAnyPlateEmpty())
+                {
+                    rule1 = true;
+                }
+                if (bomb.GetSolvedModuleNames().Count >= 2)
+                {
+                    rule2 = true;
+                }
+                if (bomb.IsIndicatorPresent("FRQ") && bomb.IsIndicatorOn("FRQ"))
+                {
+                    rule3 = true;
+                }
+                if (!bomb.IsIndicatorPresent("FRQ") && !bomb.IsIndicatorOn("FRQ"))
+                {
+                    if ((bomb.GetModuleNames().Count - bomb.GetSolvableModuleNames().Count) > 0)
+                    {
+                        rule4 = true;
+                    }
+                    if (bomb.IsIndicatorPresent("BOB") && bomb.IsIndicatorOff("BOB"))
+                    {
+                        rule5 = true;
+                    }
+                }
+                answerlong = reCalcTorque(rule1, rule2, rule3, rule4, rule5, newnumbers[0], newnumbers[1]);
+                answersimp = Mathf.Round(answerlong);
+                answersimp = Mathf.Abs(answersimp);
+                Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
+                Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0}: {1}", moduleId, answersimp);
+            }
+        }
+        //here to prevent from happening infinitely
+        if ((announceonce == 1) && (symbol == 5))
+        {
+            announceonce = 2;
+        }
+        if ((bomb.GetSolvedModuleNames().Count >= 1) && (symbol == 2))
+        {
+            if (announceonce != 2)
+            {
+                announceonce = 1;
+                bool rule1 = false;
+                if (bomb.GetSerialNumber().Contains('3') || bomb.GetSerialNumber().Contains('5'))
+                {
+                    rule1 = true;
+                }
+                answerlong = reCalcPosition(rule1, newnumbers[0], newnumbers[1], newnumbers[2], newnumbers[3]);
+                answersimp = Mathf.Round(answerlong);
+                answersimp = Mathf.Abs(answersimp);
+                Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
+                Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0}: {1}", moduleId, answersimp);
+            }
+        }
+        //here to prevent from happening infinitely
+        if ((announceonce == 1) && (symbol == 2))
+        {
+            announceonce = 2;
+        }
+        if ((bomb.GetStrikes() == 2) && (symbol == 7))
         {
             typeNothing = true;
             if(announceonce != 2)
@@ -67,7 +136,8 @@ public class EquationsScript : MonoBehaviour {
                 announceonce = 1;
             }
         }
-        if(announceonce == 1)
+        //here to prevent from happening infinitely
+        if ((announceonce == 1) && (symbol == 7))
         {
             Debug.LogFormat("[Equations X #{0}] Rule 1 is now {1}!", moduleId, typeNothing);
             Debug.LogFormat("[Equations X #{0}] Answer is now to press submit with no input!", moduleId);
@@ -92,32 +162,44 @@ public class EquationsScript : MonoBehaviour {
                 int.TryParse(inputdisplay.GetComponentInChildren<TextMesh>().text, out checkanswer);
                 if ((typeNothing == true) && (inputdisplay.GetComponentInChildren<TextMesh>().text.Length == 0))
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered nothing, nothing was expected", moduleId, checkanswer);
+                    Debug.LogFormat("[Equations X #{0}] Nothing was correct, good job!", moduleId);
                     GetComponent<KMBombModule>().HandlePass();
                     moduleSolved = true;
                     inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
                 }
                 else if ((typeNothing == true) && !(inputdisplay.GetComponentInChildren<TextMesh>().text.Length == 0))
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered {1}, nothing was expected", moduleId, checkanswer);
+                    Debug.LogFormat("[Equations X #{0}] {1} was incorrect, try again!", moduleId, checkanswer);
                     GetComponent<KMBombModule>().HandleStrike();
                 }
                 else if ((typeSomething == true) && inputdisplay.GetComponentInChildren<TextMesh>().text.Equals("116"))
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered 116, 116 was expected", moduleId);
+                    Debug.LogFormat("[Equations X #{0}] 116 was correct, good job!", moduleId);
                     GetComponent<KMBombModule>().HandlePass();
                     moduleSolved = true;
                     inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
                 }
                 else if ((typeSomething == true) && !inputdisplay.GetComponentInChildren<TextMesh>().text.Equals("116"))
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered {1}, 116 was expected", moduleId, checkanswer);
+                    Debug.LogFormat("[Equations X #{0}] {1} was incorrect, try again!", moduleId, checkanswer);
                     GetComponent<KMBombModule>().HandleStrike();
                 }
                 else if (checkanswer == answersimp)
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered {1}, {2} was expected", moduleId, checkanswer, answersimp);
+                    Debug.LogFormat("[Equations X #{0}] {1} was correct, good job!", moduleId, checkanswer);
                     GetComponent<KMBombModule>().HandlePass();
                     moduleSolved = true;
                     inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
                 }
                 else
                 {
+                    Debug.LogFormat("[Equations X #{0}] You entered {1}, {2} was expected", moduleId, checkanswer, answersimp);
+                    Debug.LogFormat("[Equations X #{0}] {1} was incorrect, try again!", moduleId, checkanswer);
                     GetComponent<KMBombModule>().HandleStrike();
                 }
             }
@@ -203,7 +285,6 @@ public class EquationsScript : MonoBehaviour {
 
     private float calculateAnswer(string numbers)
     {
-        float[] newnumbers;
         float tempanswer = -1;
         if (symbol == 2)
         {
@@ -420,19 +501,19 @@ public class EquationsScript : MonoBehaviour {
                     Debug.LogFormat("[Equations X #{0}] New Equation: num1 * num2", moduleId);
                     Debug.LogFormat("[Equations X #{0}] With number substitutions: {1} * {2}", moduleId, newnumbers[0], newnumbers[1]);
                 }
-                else if ((rule1 == false) && (rule3 == true))
+                else if ((rule1 == false) && (rule2 == true))
                 {
                     tempanswer = (newnumbers[0] * newnumbers[1]) + 14;
                     Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 14", moduleId);
                     Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 14", moduleId, newnumbers[0], newnumbers[1]);
                 }
-                else if ((rule1 == true) && (rule3 == false))
+                else if ((rule1 == true) && (rule2 == false))
                 {
                     tempanswer = ((2) * (newnumbers[0] * newnumbers[1])) / 3;
                     Debug.LogFormat("[Equations X #{0}] New Equation: (2/3) * (num1 * num2)", moduleId);
                     Debug.LogFormat("[Equations X #{0}] With number substitutions: (2/3) * ({1} * {2})", moduleId, newnumbers[0], newnumbers[1]);
                 }
-                else if ((rule1 == true) && (rule3 == true))
+                else if ((rule1 == true) && (rule2 == true))
                 {
                     tempanswer = (((2) * (newnumbers[0] * newnumbers[1])) / 3) + 14;
                     Debug.LogFormat("[Equations X #{0}] New Equation: ((2/3) * (num1 * num2)) + 14", moduleId);
@@ -596,6 +677,12 @@ public class EquationsScript : MonoBehaviour {
                     tempanswer = (newnumbers[0] * newnumbers[1]) + 13;
                     Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 13", moduleId);
                     Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 13", moduleId, newnumbers[0], newnumbers[1]);
+                }
+                else if (rule5 == true && rule1 == false && rule2 == false)
+                {
+                    tempanswer = (newnumbers[0] * newnumbers[1]) + 3;
+                    Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 3", moduleId);
+                    Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 3", moduleId, newnumbers[0], newnumbers[1]);
                 }
                 else if (rule5 == true && rule1 == true && rule2 == true)
                 {
@@ -825,6 +912,97 @@ public class EquationsScript : MonoBehaviour {
         return tempcount;
     }
 
+    private float reCalcPosition(bool rule1, float num1, float num2, float num3, float num4)
+    {
+        float tempanswer;
+        Debug.LogFormat("[Equations X #{0}] Rule 3 is now true! Recalculating answer...", moduleId);
+        if (rule1 == true)
+        {
+            tempanswer = (num1 * Mathf.Sin(((num2 * num3) + num4) * ((Mathf.PI) / 180))) + 21;
+            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * sin((num2 * num3) + num4)) + 21", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * sin(({2} * {3}) + {4})) + 21", moduleId, num1, num2, num3, num4);
+        }
+        else
+        {
+            tempanswer = num1 * Mathf.Sin(((num2 * num3) + num4) * ((Mathf.PI) / 180));
+            Debug.LogFormat("[Equations X #{0}] New Equation: num1 * sin((num2 * num3) + num4)", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: {1} * sin(({2} * {3}) + {4})", moduleId, num1, num2, num3, num4);
+        }
+        return tempanswer;
+    }
+
+    private float reCalcTorque(bool rule1, bool rule2, bool rule3, bool rule4, bool rule5, float num1, float num2)
+    {
+        float tempanswer = 0;
+        Debug.LogFormat("[Equations X #{0}] Rule 2 is now true! Recalculating answer...", moduleId);
+        if (rule3 == true)
+        {
+            rule4 = false;
+            rule5 = false;
+        }
+        if (rule1 == true)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]) + 10;
+            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 10", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 10", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        if (rule2 == true && rule1 == false)
+        {
+            tempanswer = ((newnumbers[0] / 2) * (newnumbers[1] / 2));
+            Debug.LogFormat("[Equations X #{0}] New Equation: ((num1 / 2) * (num2 / 2))", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: (({1} / 2) * ({2} / 2))", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        else if (rule2 == true && rule1 == true)
+        {
+            tempanswer = ((newnumbers[0] / 2.0F) * (float)(newnumbers[1] / 2.0F)) + 5.0F;
+            Debug.LogFormat("[Equations X #{0}] New Equation: ((num1 / 2) * (num2 / 2)) + 5", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: (({1} / 2) * ({2} / 2)) + 5", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        if (rule4 == true)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]);
+            Debug.LogFormat("[Equations X #{0}] New Equation: num1 * num2", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: {1} * {2}", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        if (rule5 == true && rule4 == true)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]) + 3;
+            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 3", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 3", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        else if (rule5 == true && rule1 == true && rule2 == false)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]) + 13;
+            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 13", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 13", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        else if (rule5 == true && rule1 == false && rule2 == false)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]) + 3;
+            Debug.LogFormat("[Equations X #{0}] New Equation: (num1 * num2) + 3", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: ({1} * {2}) + 3", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        else if (rule5 == true && rule1 == true && rule2 == true)
+        {
+            tempanswer = ((newnumbers[0] / 2) * (newnumbers[1] / 2)) + 8;
+            Debug.LogFormat("[Equations X #{0}] New Equation: ((num1 / 2) * (num2 / 2)) + 8", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: (({1} / 2) * ({2} / 2)) + 8", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        else if (rule5 == true && rule1 == false && rule2 == true)
+        {
+            tempanswer = ((newnumbers[0] / 2) * (newnumbers[1] / 2)) + 3;
+            Debug.LogFormat("[Equations X #{0}] New Equation: ((num1 / 2) * (num2 / 2)) + 3", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: (({1} / 2) * ({2} / 2)) + 3", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        if (rule1 == false && rule2 == false && rule5 == false)
+        {
+            tempanswer = (newnumbers[0] * newnumbers[1]);
+            Debug.LogFormat("[Equations X #{0}] New Equation: num1 * num2", moduleId);
+            Debug.LogFormat("[Equations X #{0}] With number substitutions: {1} * {2}", moduleId, newnumbers[0], newnumbers[1]);
+        }
+        return tempanswer;
+    }
+
     private int getWidgetCount()
     {
         int tempcount = 0;
@@ -881,13 +1059,13 @@ public class EquationsScript : MonoBehaviour {
 
     private string randomCheer()
     {
-        int cheernum = Random.RandomRange(0, 4);
+        int cheernum = Random.RandomRange(0, 5);
         return cheers[cheernum];
     }
 
     //twitch plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display]";
+    private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display] | !{0} submit 1024 [Enters the number '1024' into the input display AND submits it]";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
@@ -895,15 +1073,16 @@ public class EquationsScript : MonoBehaviour {
         string[] parameters = command.Split(' ');
         foreach (string param in parameters)
         {
+            yield return null;
             if (param.Equals("clear"))
             {
+                buttons[10].OnInteract();
                 yield return new WaitForSeconds(.1f);
-                PressButton(buttons[10]);
                 break;
-            }else if (param.Equals("submit"))
+            }else if (param.Equals("submit") && (parameters.Length <= 1))
             {
+                buttons[11].OnInteract();
                 yield return new WaitForSeconds(.1f);
-                PressButton(buttons[11]);
                 break;
             }
             else if (param.Equals("enter") && !(parameters.Length <= 1))
@@ -913,45 +1092,96 @@ public class EquationsScript : MonoBehaviour {
                 {
                     if (num.Equals('0'))
                     {
-                        PressButton(buttons[0]);
+                        buttons[0].OnInteract();
                     }else if (num.Equals('1'))
                     {
-                        PressButton(buttons[1]);
+                        buttons[1].OnInteract();
                     }
                     else if (num.Equals('2'))
                     {
-                        PressButton(buttons[2]);
+                        buttons[2].OnInteract();
                     }
                     else if (num.Equals('3'))
                     {
-                        PressButton(buttons[3]);
+                        buttons[3].OnInteract();
                     }
                     else if (num.Equals('4'))
                     {
-                        PressButton(buttons[4]);
+                        buttons[4].OnInteract();
                     }
                     else if (num.Equals('5'))
                     {
-                        PressButton(buttons[5]);
+                        buttons[5].OnInteract();
                     }
                     else if (num.Equals('6'))
                     {
-                        PressButton(buttons[6]);
+                        buttons[6].OnInteract();
                     }
                     else if (num.Equals('7'))
                     {
-                        PressButton(buttons[7]);
+                        buttons[7].OnInteract();
                     }
                     else if (num.Equals('8'))
                     {
-                        PressButton(buttons[8]);
+                        buttons[8].OnInteract();
                     }
                     else if (num.Equals('9'))
                     {
-                        PressButton(buttons[9]);
+                        buttons[9].OnInteract();
                     }
                     yield return new WaitForSeconds(.2f);
                 }
+                break;
+            }
+            else if (param.Equals("submit") && !(parameters.Length <= 1))
+            {
+                buttons[10].OnInteract();
+                char[] integers = parameters[1].ToCharArray();
+                foreach (char num in integers)
+                {
+                    if (num.Equals('0'))
+                    {
+                        buttons[0].OnInteract();
+                    }
+                    else if (num.Equals('1'))
+                    {
+                        buttons[1].OnInteract();
+                    }
+                    else if (num.Equals('2'))
+                    {
+                        buttons[2].OnInteract();
+                    }
+                    else if (num.Equals('3'))
+                    {
+                        buttons[3].OnInteract();
+                    }
+                    else if (num.Equals('4'))
+                    {
+                        buttons[4].OnInteract();
+                    }
+                    else if (num.Equals('5'))
+                    {
+                        buttons[5].OnInteract();
+                    }
+                    else if (num.Equals('6'))
+                    {
+                        buttons[6].OnInteract();
+                    }
+                    else if (num.Equals('7'))
+                    {
+                        buttons[7].OnInteract();
+                    }
+                    else if (num.Equals('8'))
+                    {
+                        buttons[8].OnInteract();
+                    }
+                    else if (num.Equals('9'))
+                    {
+                        buttons[9].OnInteract();
+                    }
+                    yield return new WaitForSeconds(.2f);
+                }
+                buttons[11].OnInteract();
                 break;
             }
             else
@@ -959,6 +1189,5 @@ public class EquationsScript : MonoBehaviour {
                 break;
             }
         }
-        yield return null;
     }
 }
