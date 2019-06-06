@@ -203,12 +203,12 @@ namespace KModkit
             return GetIndicatorEntries(bombInfo).Any((x) => !x.IsOn() && indicatorLabel.Equals(x.label));
         }
 
-        public static IEnumerable<string> GetOnIndicators(this KMBombInfo bombInfo)
+        public static IEnumerable<string> GetIndicators(this KMBombInfo bombInfo)
         {
             return GetIndicatorEntries(bombInfo).Select((x) => x.label);
         }
 
-        public static IEnumerable<string> GetIndicators(this KMBombInfo bombInfo)
+        public static IEnumerable<string> GetOnIndicators(this KMBombInfo bombInfo)
         {
             return GetIndicatorEntries(bombInfo).Where((x) => x.IsOn()).Select((x) => x.label);
         }
