@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KModkit;
+using System.Text.RegularExpressions;
 
 public class EquationsScript : MonoBehaviour {
 
@@ -1070,124 +1071,139 @@ public class EquationsScript : MonoBehaviour {
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] parameters = command.Split(' ');
-        foreach (string param in parameters)
+        if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            if (param.Equals("clear"))
+            yield return new[] { buttons[10] };
+            yield break;
+        }
+        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(command, @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && (parameters.Length <= 1))
+        {
+            yield return null;
+            yield return new[] { buttons[11] };
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
+        {
+            var buttonsToPress = new List<KMSelectable>();
+            buttonsToPress.Add(buttons[10]);
+            char[] integers = parameters[1].ToCharArray();
+            foreach (char num in integers)
             {
-                buttons[10].OnInteract();
-                yield return new WaitForSeconds(.1f);
-                break;
-            }else if (param.Equals("submit") && (parameters.Length <= 1))
-            {
-                buttons[11].OnInteract();
-                yield return new WaitForSeconds(.1f);
-                break;
-            }
-            else if (param.Equals("enter") && !(parameters.Length <= 1))
-            {
-                char[] integers = parameters[1].ToCharArray();
-                foreach(char num in integers)
+                if (num.Equals('0'))
                 {
-                    if (num.Equals('0'))
-                    {
-                        buttons[0].OnInteract();
-                    }else if (num.Equals('1'))
-                    {
-                        buttons[1].OnInteract();
-                    }
-                    else if (num.Equals('2'))
-                    {
-                        buttons[2].OnInteract();
-                    }
-                    else if (num.Equals('3'))
-                    {
-                        buttons[3].OnInteract();
-                    }
-                    else if (num.Equals('4'))
-                    {
-                        buttons[4].OnInteract();
-                    }
-                    else if (num.Equals('5'))
-                    {
-                        buttons[5].OnInteract();
-                    }
-                    else if (num.Equals('6'))
-                    {
-                        buttons[6].OnInteract();
-                    }
-                    else if (num.Equals('7'))
-                    {
-                        buttons[7].OnInteract();
-                    }
-                    else if (num.Equals('8'))
-                    {
-                        buttons[8].OnInteract();
-                    }
-                    else if (num.Equals('9'))
-                    {
-                        buttons[9].OnInteract();
-                    }
-                    yield return new WaitForSeconds(.2f);
+                    buttonsToPress.Add(buttons[0]);
                 }
-                break;
-            }
-            else if (param.Equals("submit") && !(parameters.Length <= 1))
-            {
-                buttons[10].OnInteract();
-                char[] integers = parameters[1].ToCharArray();
-                foreach (char num in integers)
+                else if (num.Equals('1'))
                 {
-                    if (num.Equals('0'))
-                    {
-                        buttons[0].OnInteract();
-                    }
-                    else if (num.Equals('1'))
-                    {
-                        buttons[1].OnInteract();
-                    }
-                    else if (num.Equals('2'))
-                    {
-                        buttons[2].OnInteract();
-                    }
-                    else if (num.Equals('3'))
-                    {
-                        buttons[3].OnInteract();
-                    }
-                    else if (num.Equals('4'))
-                    {
-                        buttons[4].OnInteract();
-                    }
-                    else if (num.Equals('5'))
-                    {
-                        buttons[5].OnInteract();
-                    }
-                    else if (num.Equals('6'))
-                    {
-                        buttons[6].OnInteract();
-                    }
-                    else if (num.Equals('7'))
-                    {
-                        buttons[7].OnInteract();
-                    }
-                    else if (num.Equals('8'))
-                    {
-                        buttons[8].OnInteract();
-                    }
-                    else if (num.Equals('9'))
-                    {
-                        buttons[9].OnInteract();
-                    }
-                    yield return new WaitForSeconds(.2f);
+                    buttonsToPress.Add(buttons[1]);
                 }
-                buttons[11].OnInteract();
-                break;
+                else if (num.Equals('2'))
+                {
+                    buttonsToPress.Add(buttons[2]);
+                }
+                else if (num.Equals('3'))
+                {
+                    buttonsToPress.Add(buttons[3]);
+                }
+                else if (num.Equals('4'))
+                {
+                    buttonsToPress.Add(buttons[4]);
+                }
+                else if (num.Equals('5'))
+                {
+                    buttonsToPress.Add(buttons[5]);
+                }
+                else if (num.Equals('6'))
+                {
+                    buttonsToPress.Add(buttons[6]);
+                }
+                else if (num.Equals('7'))
+                {
+                    buttonsToPress.Add(buttons[7]);
+                }
+                else if (num.Equals('8'))
+                {
+                    buttonsToPress.Add(buttons[8]);
+                }
+                else if (num.Equals('9'))
+                {
+                    buttonsToPress.Add(buttons[9]);
+                }
+                else
+                {
+                    yield break;
+                }
             }
-            else
+            buttonsToPress.Add(buttons[11]);
+            yield return null;
+            foreach (KMSelectable km in buttonsToPress)
             {
-                break;
+                km.OnInteract();
+                yield return new WaitForSeconds(.2f);
             }
+            yield break;
+        }
+        if (Regex.IsMatch(parameters[0], @"^\s*enter\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
+        {
+            var buttonsToPress = new List<KMSelectable>();
+            buttonsToPress.Add(buttons[10]);
+            char[] integers = parameters[1].ToCharArray();
+            foreach (char num in integers)
+            {
+                if (num.Equals('0'))
+                {
+                    buttonsToPress.Add(buttons[0]);
+                }
+                else if (num.Equals('1'))
+                {
+                    buttonsToPress.Add(buttons[1]);
+                }
+                else if (num.Equals('2'))
+                {
+                    buttonsToPress.Add(buttons[2]);
+                }
+                else if (num.Equals('3'))
+                {
+                    buttonsToPress.Add(buttons[3]);
+                }
+                else if (num.Equals('4'))
+                {
+                    buttonsToPress.Add(buttons[4]);
+                }
+                else if (num.Equals('5'))
+                {
+                    buttonsToPress.Add(buttons[5]);
+                }
+                else if (num.Equals('6'))
+                {
+                    buttonsToPress.Add(buttons[6]);
+                }
+                else if (num.Equals('7'))
+                {
+                    buttonsToPress.Add(buttons[7]);
+                }
+                else if (num.Equals('8'))
+                {
+                    buttonsToPress.Add(buttons[8]);
+                }
+                else if (num.Equals('9'))
+                {
+                    buttonsToPress.Add(buttons[9]);
+                }
+                else
+                {
+                    yield break;
+                }
+            }
+            yield return null;
+            foreach (KMSelectable km in buttonsToPress)
+            {
+                km.OnInteract();
+                yield return new WaitForSeconds(.2f);
+            }
+            yield break;
         }
     }
 }
