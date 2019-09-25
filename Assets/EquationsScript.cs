@@ -1066,12 +1066,13 @@ public class EquationsScript : MonoBehaviour {
 
     //twitch plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display] | !{0} submit 1024 [Enters the number '1024' into the input display AND submits it]";
+    //private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display] | !{0} submit 1024 [Enters the number '1024' into the input display AND submits it]";
+    private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number]";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        /**if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
             yield return new[] { buttons[10] };
@@ -1083,7 +1084,10 @@ public class EquationsScript : MonoBehaviour {
             yield return null;
             yield return new[] { buttons[11] };
             yield break;
-        }
+        }*/
+        //This was not here originally
+        string[] parameters = command.Split(' ');
+        //end originally not here
         if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
         {
             var buttonsToPress = new List<KMSelectable>();
@@ -1145,7 +1149,7 @@ public class EquationsScript : MonoBehaviour {
             }
             yield break;
         }
-        if (Regex.IsMatch(parameters[0], @"^\s*enter\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
+        /**if (Regex.IsMatch(parameters[0], @"^\s*enter\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
         {
             var buttonsToPress = new List<KMSelectable>();
             buttonsToPress.Add(buttons[10]);
@@ -1204,6 +1208,6 @@ public class EquationsScript : MonoBehaviour {
                 yield return new WaitForSeconds(.2f);
             }
             yield break;
-        }
+        }*/
     }
 }
