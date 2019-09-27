@@ -22,8 +22,8 @@ public class EquationsScript : MonoBehaviour {
     private string numbers;
     private string[] cheers = {"Nice!","GJ","Defused","Cleared","We did it?"};
 
-    private float answerlong;
-    private float answersimp;
+    private double answerlong;
+    private double answersimp;
     //moved here to allow for rule 3 of position to function properly
     private float[] newnumbers;
 
@@ -50,10 +50,10 @@ public class EquationsScript : MonoBehaviour {
         inputdisplay.GetComponentInChildren<TextMesh>().text = "";
         symboldisplay.GetComponentInChildren<TextMesh>().text = DigitToSymbol(symbol);
         numbersdisplay.GetComponentInChildren<TextMesh>().text = numbers;
-
+        
         answerlong = calculateAnswer(numbers);
-        answersimp = Mathf.Round(answerlong);
-        answersimp = Mathf.Abs(answersimp);
+        answersimp = System.Math.Round(answerlong, 0, System.MidpointRounding.AwayFromZero);
+        answersimp = System.Math.Abs(answersimp);
         if(typeNothing != true)
         {
             Debug.LogFormat("[Equations X #{0}] Answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
@@ -96,8 +96,8 @@ public class EquationsScript : MonoBehaviour {
                     }
                 }
                 answerlong = reCalcTorque(rule1, rule2, rule3, rule4, rule5, newnumbers[0], newnumbers[1]);
-                answersimp = Mathf.Round(answerlong);
-                answersimp = Mathf.Abs(answersimp);
+                answersimp = System.Math.Round(answerlong, 0, System.MidpointRounding.AwayFromZero);
+                answersimp = System.Math.Abs(answersimp);
                 Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
                 Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0}: {1}", moduleId, answersimp);
             }
@@ -118,8 +118,8 @@ public class EquationsScript : MonoBehaviour {
                     rule1 = true;
                 }
                 answerlong = reCalcPosition(rule1, newnumbers[0], newnumbers[1], newnumbers[2], newnumbers[3]);
-                answersimp = Mathf.Round(answerlong);
-                answersimp = Mathf.Abs(answersimp);
+                answersimp = System.Math.Round(answerlong, 0, System.MidpointRounding.AwayFromZero);
+                answersimp = System.Math.Abs(answersimp);
                 Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
                 Debug.LogFormat("[Equations X #{0}] New answer to Equations X #{0}: {1}", moduleId, answersimp);
             }
@@ -1067,7 +1067,7 @@ public class EquationsScript : MonoBehaviour {
     //twitch plays
     #pragma warning disable 414
     //private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display] | !{0} submit 1024 [Enters the number '1024' into the input display AND submits it]";
-    private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number]";
+    private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number] | !{0} nothing [Presses submit with no inputs]";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
@@ -1086,6 +1086,14 @@ public class EquationsScript : MonoBehaviour {
             yield break;
         }*/
         //This was not here originally
+        if (Regex.IsMatch(command, @"^\s*nothing\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            buttons[10].OnInteract();
+            yield return new WaitForSeconds(.2f);
+            buttons[11].OnInteract();
+            yield break;
+        }
         string[] parameters = command.Split(' ');
         //end originally not here
         if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
@@ -1209,5 +1217,17 @@ public class EquationsScript : MonoBehaviour {
             }
             yield break;
         }*/
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if(typeNothing != true)
+        {
+            yield return ProcessTwitchCommand("submit " + answersimp);
+        }
+        else
+        {
+            yield return ProcessTwitchCommand("nothing");
+        }
     }
 }

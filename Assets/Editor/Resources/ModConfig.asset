@@ -23,7 +23,7 @@ MonoBehaviour:
     that an Equations module had already been made people still liked my idea. So
     I had to officially name it Equations X, mainly because if I named it anything
     other than equations it would just not be right. This is not the official sequel
-    to Equations by AAces (the guy with the original Equatons module), but instead
+    to Equations by AAces (the guy with the original Equations module), but instead
     my own module that came completely from my mind, so please don''t think that this
     was inspired by that module.
 
@@ -33,11 +33,11 @@ MonoBehaviour:
     PDF: https://ktane.timwi.de/PDF/Equations%20X.pdf#1
 
 
-    Equations X (equationsXModule) v1.1.5
+    Equations X (equationsXModule) v1.1.6
 
     Mod and Concept by eXish
 
     Twitch Plays supported'
-  version: 1.1.5
+  version: 1.1.6
   outputFolder: build
   previewImage: {fileID: 2800000, guid: c0b2ae231f11b024fafeeeb9603aa510, type: 3}
