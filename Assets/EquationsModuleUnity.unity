@@ -113,12 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &7823421 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114616266566084194, guid: cb987f857cf4ae846987adffd2b2f7a9,
-    type: 2}
-  m_PrefabInternal: {fileID: 1332019560}
-  m_Script: {fileID: 1702003387, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
 --- !u!1 &115240009
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,12 +259,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &982121018 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114827566311496650, guid: cb987f857cf4ae846987adffd2b2f7a9,
-    type: 2}
-  m_PrefabInternal: {fileID: 1332019560}
-  m_Script: {fileID: 1702003387, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
 --- !u!1001 &1332019560
 Prefab:
   m_ObjectHideFlags: 0
@@ -310,21 +298,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114137747078870040, guid: cb987f857cf4ae846987adffd2b2f7a9,
-        type: 2}
-      propertyPath: ChildRowLength
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114137747078870040, guid: cb987f857cf4ae846987adffd2b2f7a9,
-        type: 2}
-      propertyPath: Children.Array.data[9]
-      value: 
-      objectReference: {fileID: 982121018}
-    - target: {fileID: 114137747078870040, guid: cb987f857cf4ae846987adffd2b2f7a9,
-        type: 2}
-      propertyPath: Children.Array.data[11]
-      value: 
-      objectReference: {fileID: 7823421}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cb987f857cf4ae846987adffd2b2f7a9, type: 2}
   m_IsPrefabParent: 0
