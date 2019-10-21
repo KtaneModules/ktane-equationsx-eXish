@@ -315,13 +315,13 @@ public class EquationsScript : MonoBehaviour {
             {
                 if (numbers.Contains('5'))
                 {
-                    numbers.Replace('5', '8');
+                    numbers = numbers.Replace('5', '8');
                     string[] numssplit2 = numbers.Split('.');
-                    int counter2 = 0;
-                    foreach (string num in numssplit2)
+                    for (int i = 0; i < newnumbers.Length; i++)
                     {
-                        float.TryParse(numssplit2[counter2], out newnumbers[counter]);
-                        counter++;
+                        float temp = 0;
+                        float.TryParse(numssplit2[i], out temp);
+                        newnumbers[i] = temp;
                     }
                 }
                 rule2 = true;
