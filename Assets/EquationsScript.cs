@@ -32,6 +32,7 @@ public class EquationsScript : MonoBehaviour {
     private bool moduleSolved;
     private bool typeNothing;
     private bool typeSomething;
+    private bool animating = false;
     private int announceonce = 0;
 
     void Awake()
@@ -48,8 +49,8 @@ public class EquationsScript : MonoBehaviour {
         symbol = Random.RandomRange(0, 9);
         numbers = DigitToNumbers(symbol);
         inputdisplay.GetComponentInChildren<TextMesh>().text = "";
-        symboldisplay.GetComponentInChildren<TextMesh>().text = DigitToSymbol(symbol);
-        numbersdisplay.GetComponentInChildren<TextMesh>().text = numbers;
+        symboldisplay.GetComponentInChildren<TextMesh>().text = "";
+        numbersdisplay.GetComponentInChildren<TextMesh>().text = "";
         
         answerlong = calculateAnswer(numbers);
         answersimp = System.Math.Round(answerlong, 0, System.MidpointRounding.AwayFromZero);
@@ -59,9 +60,16 @@ public class EquationsScript : MonoBehaviour {
             Debug.LogFormat("[Equations X #{0}] Answer to Equations X #{0} (unsimplified): {1}", moduleId, answerlong);
             Debug.LogFormat("[Equations X #{0}] Answer to Equations X #{0}: {1}", moduleId, answersimp);
         }
+        GetComponent<KMBombModule>().OnActivate += OnActivate;
     }
-	
-	void Update () {
+
+    void OnActivate()
+    {
+        symboldisplay.GetComponentInChildren<TextMesh>().text = DigitToSymbol(symbol);
+        numbersdisplay.GetComponentInChildren<TextMesh>().text = numbers;
+    }
+
+    void Update () {
         if ((bomb.GetSolvedModuleNames().Count >= 2) && (symbol == 5))
         {
             if (announceonce != 2)
@@ -148,16 +156,19 @@ public class EquationsScript : MonoBehaviour {
 
     void PressButton(KMSelectable pressed)
     {
-        if(moduleSolved != true)
+        if(moduleSolved != true && animating != true)
         {
-            pressed.AddInteractionPunch(0.5f);
             if (pressed.GetComponentInChildren<TextMesh>().text.Equals("C"))
             {
+                StartCoroutine(animateButton(pressed));
+                pressed.AddInteractionPunch(0.5f);
                 audio.PlaySoundAtTransform("buttonClickCustom", transform);
                 inputdisplay.GetComponentInChildren<TextMesh>().text = "";
             }
             else if (pressed.GetComponentInChildren<TextMesh>().text.Equals("SUBMIT"))
             {
+                StartCoroutine(animateButton(pressed));
+                pressed.AddInteractionPunch(0.5f);
                 audio.PlaySoundAtTransform("submitButton", transform);
                 int checkanswer = 0;
                 int.TryParse(inputdisplay.GetComponentInChildren<TextMesh>().text, out checkanswer);
@@ -165,9 +176,7 @@ public class EquationsScript : MonoBehaviour {
                 {
                     Debug.LogFormat("[Equations X #{0}] You entered nothing, nothing was expected", moduleId, checkanswer);
                     Debug.LogFormat("[Equations X #{0}] Nothing was correct, good job!", moduleId);
-                    GetComponent<KMBombModule>().HandlePass();
-                    moduleSolved = true;
-                    inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
+                    dealWithSolve();
                 }
                 else if ((typeNothing == true) && !(inputdisplay.GetComponentInChildren<TextMesh>().text.Length == 0))
                 {
@@ -179,9 +188,7 @@ public class EquationsScript : MonoBehaviour {
                 {
                     Debug.LogFormat("[Equations X #{0}] You entered 116, 116 was expected", moduleId);
                     Debug.LogFormat("[Equations X #{0}] 116 was correct, good job!", moduleId);
-                    GetComponent<KMBombModule>().HandlePass();
-                    moduleSolved = true;
-                    inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
+                    dealWithSolve();
                 }
                 else if ((typeSomething == true) && !inputdisplay.GetComponentInChildren<TextMesh>().text.Equals("116"))
                 {
@@ -193,9 +200,7 @@ public class EquationsScript : MonoBehaviour {
                 {
                     Debug.LogFormat("[Equations X #{0}] You entered {1}, {2} was expected", moduleId, checkanswer, answersimp);
                     Debug.LogFormat("[Equations X #{0}] {1} was correct, good job!", moduleId, checkanswer);
-                    GetComponent<KMBombModule>().HandlePass();
-                    moduleSolved = true;
-                    inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
+                    dealWithSolve();
                 }
                 else
                 {
@@ -206,10 +211,33 @@ public class EquationsScript : MonoBehaviour {
             }
             else if (inputdisplay.GetComponentInChildren<TextMesh>().text.Length <= 6)
             {
+                StartCoroutine(animateButton(pressed));
+                pressed.AddInteractionPunch(0.5f);
                 audio.PlaySoundAtTransform("buttonClickCustom", transform);
                 inputdisplay.GetComponentInChildren<TextMesh>().text += pressed.GetComponentInChildren<TextMesh>().text;
             }
         }
+    }
+
+    private IEnumerator animateButton(KMSelectable button)
+    {
+        animating = true;
+        int movement = 0;
+        while (movement != 10)
+        {
+            yield return new WaitForSeconds(0.0001f);
+            button.transform.localPosition = button.transform.localPosition + Vector3.up * -0.001f;
+            movement++;
+        }
+        movement = 0;
+        while (movement != 10)
+        {
+            yield return new WaitForSeconds(0.0001f);
+            button.transform.localPosition = button.transform.localPosition + Vector3.up * 0.001f;
+            movement++;
+        }
+        StopCoroutine("animateButton");
+        animating = false;
     }
 
     private string DigitToSymbol(int digit)
@@ -1062,6 +1090,15 @@ public class EquationsScript : MonoBehaviour {
     {
         int cheernum = Random.RandomRange(0, 5);
         return cheers[cheernum];
+    }
+
+    private void dealWithSolve()
+    {
+        GetComponent<KMBombModule>().HandlePass();
+        moduleSolved = true;
+        numbersdisplay.GetComponentInChildren<TextMesh>().text = "";
+        symboldisplay.GetComponentInChildren<TextMesh>().text = "";
+        inputdisplay.GetComponentInChildren<TextMesh>().text = randomCheer();
     }
 
     //twitch plays
