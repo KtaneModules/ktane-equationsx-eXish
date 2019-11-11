@@ -32,7 +32,6 @@ public class EquationsScript : MonoBehaviour {
     private bool moduleSolved;
     private bool typeNothing;
     private bool typeSomething;
-    private bool animating = false;
     private int announceonce = 0;
 
     void Awake()
@@ -156,7 +155,7 @@ public class EquationsScript : MonoBehaviour {
 
     void PressButton(KMSelectable pressed)
     {
-        if(moduleSolved != true && animating != true)
+        if(moduleSolved != true)
         {
             if (pressed.GetComponentInChildren<TextMesh>().text.Equals("C"))
             {
@@ -221,7 +220,6 @@ public class EquationsScript : MonoBehaviour {
 
     private IEnumerator animateButton(KMSelectable button)
     {
-        animating = true;
         int movement = 0;
         while (movement != 10)
         {
@@ -237,7 +235,6 @@ public class EquationsScript : MonoBehaviour {
             movement++;
         }
         StopCoroutine("animateButton");
-        animating = false;
     }
 
     private string DigitToSymbol(int digit)
@@ -1190,10 +1187,7 @@ public class EquationsScript : MonoBehaviour {
             foreach (KMSelectable km in buttonsToPress)
             {
                 km.OnInteract();
-                while(animating == true)
-                {
-                    yield return new WaitForSeconds(0.1f);
-                }
+                yield return new WaitForSeconds(0.2f);
             }
             yield break;
         }
