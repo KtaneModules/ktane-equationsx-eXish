@@ -1190,7 +1190,10 @@ public class EquationsScript : MonoBehaviour {
             foreach (KMSelectable km in buttonsToPress)
             {
                 km.OnInteract();
-                yield return new WaitForSeconds(.2f);
+                while(animating == true)
+                {
+                    yield return new WaitForSeconds(0.1f);
+                }
             }
             yield break;
         }
