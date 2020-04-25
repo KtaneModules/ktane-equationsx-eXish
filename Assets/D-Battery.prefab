@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: 4017396350833276}
   - component: {fileID: 33061586592666914}
   - component: {fileID: 23254324963996308}
-  - component: {fileID: 114123204139002376}
+  - component: {fileID: 114143505156850292}
   m_Layer: 0
   m_Name: D Battery (1)
   m_TagString: Untagged
@@ -415,7 +415,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114123204139002376
+--- !u!114 &114143505156850292
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}

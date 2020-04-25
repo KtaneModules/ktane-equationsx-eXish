@@ -45,7 +45,7 @@ public class EquationsScript : MonoBehaviour {
     }
 
     void Start () {
-        symbol = Random.RandomRange(0, 9);
+        symbol = Random.Range(0, 9);
         numbers = DigitToNumbers(symbol);
         inputdisplay.GetComponentInChildren<TextMesh>().text = "";
         symboldisplay.GetComponentInChildren<TextMesh>().text = "";
@@ -159,16 +159,14 @@ public class EquationsScript : MonoBehaviour {
         {
             if (pressed.GetComponentInChildren<TextMesh>().text.Equals("C"))
             {
-                StartCoroutine(animateButton(pressed));
                 pressed.AddInteractionPunch(0.5f);
-                audio.PlaySoundAtTransform("buttonClickCustom", transform);
+                audio.PlaySoundAtTransform("buttonClickCustom", pressed.transform);
                 inputdisplay.GetComponentInChildren<TextMesh>().text = "";
             }
             else if (pressed.GetComponentInChildren<TextMesh>().text.Equals("SUBMIT"))
             {
-                StartCoroutine(animateButton(pressed));
                 pressed.AddInteractionPunch(0.5f);
-                audio.PlaySoundAtTransform("submitButton", transform);
+                audio.PlaySoundAtTransform("submitButton", pressed.transform);
                 int checkanswer = 0;
                 int.TryParse(inputdisplay.GetComponentInChildren<TextMesh>().text, out checkanswer);
                 if ((typeNothing == true) && (inputdisplay.GetComponentInChildren<TextMesh>().text.Length == 0))
@@ -210,31 +208,11 @@ public class EquationsScript : MonoBehaviour {
             }
             else if (inputdisplay.GetComponentInChildren<TextMesh>().text.Length <= 6)
             {
-                StartCoroutine(animateButton(pressed));
                 pressed.AddInteractionPunch(0.5f);
-                audio.PlaySoundAtTransform("buttonClickCustom", transform);
+                audio.PlaySoundAtTransform("buttonClickCustom", pressed.transform);
                 inputdisplay.GetComponentInChildren<TextMesh>().text += pressed.GetComponentInChildren<TextMesh>().text;
             }
         }
-    }
-
-    private IEnumerator animateButton(KMSelectable button)
-    {
-        int movement = 0;
-        while (movement != 10)
-        {
-            yield return new WaitForSeconds(0.0001f);
-            button.transform.localPosition = button.transform.localPosition + Vector3.up * -0.001f;
-            movement++;
-        }
-        movement = 0;
-        while (movement != 10)
-        {
-            yield return new WaitForSeconds(0.0001f);
-            button.transform.localPosition = button.transform.localPosition + Vector3.up * 0.001f;
-            movement++;
-        }
-        StopCoroutine("animateButton");
     }
 
     private string DigitToSymbol(int digit)
@@ -273,39 +251,39 @@ public class EquationsScript : MonoBehaviour {
     {
         if (digit == 0)
         {
-            return ""+Random.RandomRange(0, 100)+"."+Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 1)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 2)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100) + "." + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 3)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 4)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 5)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 6)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else if (digit == 7)
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
         else
         {
-            return "" + Random.RandomRange(0, 100) + "." + Random.RandomRange(0, 100);
+            return "" + Random.Range(0, 100) + "." + Random.Range(0, 100);
         }
     }
 
@@ -1085,7 +1063,7 @@ public class EquationsScript : MonoBehaviour {
 
     private string randomCheer()
     {
-        int cheernum = Random.RandomRange(0, 5);
+        int cheernum = Random.Range(0, 5);
         return cheers[cheernum];
     }
 
@@ -1123,17 +1101,21 @@ public class EquationsScript : MonoBehaviour {
         if (Regex.IsMatch(command, @"^\s*nothing\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
-            buttons[10].OnInteract();
-            yield return new WaitForSeconds(.2f);
+            if (inputdisplay.GetComponentInChildren<TextMesh>().text != "")
+            {
+                buttons[10].OnInteract();
+                yield return new WaitForSeconds(.2f);
+            }
             buttons[11].OnInteract();
             yield break;
         }
         string[] parameters = command.Split(' ');
         //end originally not here
-        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
+        if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1) && !(parameters.Length > 2))
         {
             var buttonsToPress = new List<KMSelectable>();
-            buttonsToPress.Add(buttons[10]);
+            if (inputdisplay.GetComponentInChildren<TextMesh>().text != "")
+                buttonsToPress.Add(buttons[10]);
             char[] integers = parameters[1].ToCharArray();
             foreach (char num in integers)
             {
@@ -1179,6 +1161,8 @@ public class EquationsScript : MonoBehaviour {
                 }
                 else
                 {
+                    yield return null;
+                    yield return "sendtochaterror The following digit is invalid: "+num;
                     yield break;
                 }
             }
