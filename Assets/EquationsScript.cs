@@ -16,7 +16,6 @@ public class EquationsScript : MonoBehaviour {
     public GameObject symboldisplay;
     public GameObject numbersdisplay;
 
-    private int[] symbols = {0,1,2,3,4,5,6,7,8};
     int symbol;
 
     private string numbers;
@@ -49,6 +48,10 @@ public class EquationsScript : MonoBehaviour {
         numbers = DigitToNumbers(symbol);
         inputdisplay.GetComponentInChildren<TextMesh>().text = "";
         symboldisplay.GetComponentInChildren<TextMesh>().text = "";
+        if (symbol == 0 || symbol == 1 || symbol == 4 || symbol == 8)
+            symboldisplay.GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0.51f, -0.05f);
+        else if (symbol == 2)
+            symboldisplay.GetComponentInChildren<TextMesh>().gameObject.transform.localPosition = new Vector3(0f, 0.51f, 0.1f);
         numbersdisplay.GetComponentInChildren<TextMesh>().text = "";
         
         answerlong = calculateAnswer(numbers);
@@ -225,7 +228,7 @@ public class EquationsScript : MonoBehaviour {
             return "R";
         }else if (digit == 2)
         {
-            return "\u03C7";
+            return "c";
         }else if (digit == 3)
         {
             return "w";
@@ -1078,26 +1081,11 @@ public class EquationsScript : MonoBehaviour {
 
     //twitch plays
     #pragma warning disable 414
-    //private readonly string TwitchHelpMessage = @"!{0} enter 1024 [Enters the number '1024' into the input display] | !{0} clear [Clears the input display] | !{0} submit [Submits what is in the input display] | !{0} submit 1024 [Enters the number '1024' into the input display AND submits it]";
     private readonly string TwitchHelpMessage = @"!{0} submit <num> [Submits the specified number] | !{0} nothing [Presses submit with no inputs]";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        /**if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-        {
-            yield return null;
-            yield return new[] { buttons[10] };
-            yield break;
-        }
-        string[] parameters = command.Split(' ');
-        if (Regex.IsMatch(command, @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && (parameters.Length <= 1))
-        {
-            yield return null;
-            yield return new[] { buttons[11] };
-            yield break;
-        }*/
-        //This was not here originally
         if (Regex.IsMatch(command, @"^\s*nothing\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
@@ -1110,7 +1098,6 @@ public class EquationsScript : MonoBehaviour {
             yield break;
         }
         string[] parameters = command.Split(' ');
-        //end originally not here
         if (Regex.IsMatch(parameters[0], @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1) && !(parameters.Length > 2))
         {
             var buttonsToPress = new List<KMSelectable>();
@@ -1175,71 +1162,11 @@ public class EquationsScript : MonoBehaviour {
             }
             yield break;
         }
-        /**if (Regex.IsMatch(parameters[0], @"^\s*enter\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && !(parameters.Length <= 1))
-        {
-            var buttonsToPress = new List<KMSelectable>();
-            buttonsToPress.Add(buttons[10]);
-            char[] integers = parameters[1].ToCharArray();
-            foreach (char num in integers)
-            {
-                if (num.Equals('0'))
-                {
-                    buttonsToPress.Add(buttons[0]);
-                }
-                else if (num.Equals('1'))
-                {
-                    buttonsToPress.Add(buttons[1]);
-                }
-                else if (num.Equals('2'))
-                {
-                    buttonsToPress.Add(buttons[2]);
-                }
-                else if (num.Equals('3'))
-                {
-                    buttonsToPress.Add(buttons[3]);
-                }
-                else if (num.Equals('4'))
-                {
-                    buttonsToPress.Add(buttons[4]);
-                }
-                else if (num.Equals('5'))
-                {
-                    buttonsToPress.Add(buttons[5]);
-                }
-                else if (num.Equals('6'))
-                {
-                    buttonsToPress.Add(buttons[6]);
-                }
-                else if (num.Equals('7'))
-                {
-                    buttonsToPress.Add(buttons[7]);
-                }
-                else if (num.Equals('8'))
-                {
-                    buttonsToPress.Add(buttons[8]);
-                }
-                else if (num.Equals('9'))
-                {
-                    buttonsToPress.Add(buttons[9]);
-                }
-                else
-                {
-                    yield break;
-                }
-            }
-            yield return null;
-            foreach (KMSelectable km in buttonsToPress)
-            {
-                km.OnInteract();
-                yield return new WaitForSeconds(.2f);
-            }
-            yield break;
-        }*/
     }
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        if(typeNothing != true)
+        if (typeNothing != true)
         {
             yield return ProcessTwitchCommand("submit " + answersimp);
         }
