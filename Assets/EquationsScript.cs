@@ -495,7 +495,7 @@ public class EquationsScript : MonoBehaviour {
                 {
                     if (numbers.Contains('3'))
                     {
-                        numbers.Replace('3','4');
+                        numbers = numbers.Replace('3', '4');
                         float.TryParse(numbers.Substring(0, numbers.IndexOf('.')), out newnumbers[0]);
                         float.TryParse(numbers.Substring(numbers.LastIndexOf('.') + 1), out newnumbers[1]);
                     }
